@@ -8,7 +8,8 @@ class PokemonPage extends React.Component {
   constructor() {
     super()
     this.state = {
-      pokemon: []
+      pokemon: [],
+      searchQuery: ""
     };
   }
 
@@ -35,22 +36,30 @@ class PokemonPage extends React.Component {
   }
 
   filterPokemon = (e, semanticProps) => {
+    const searchQuery = semanticProps.value;
     this.setState((prevState) => {
       const pokemon = prevState.pokemon.slice();
       for (const data of pokemon) {
         // if there's no query, any string includes the empty string
-        data.visible = data.name.includes(semanticProps.value);
+        data.visible = data.name.includes(searchQuery);
       }
-      return {pokemon: pokemon};
+      return {
+        pokemon: pokemon,
+        searchQuery: searchQuery
+      };
     });
   }
 
   addNewPokemon = (result) => {
     const newPokemon = this.getDataAboutPokemon(result);
+    // getDataAboutPokemon is also used in the initial page load. we're doing
+    // almost the same thing, but we also want to conditionally set the visibility
+    newPokemon.visible = newPokemon.name.includes(this.state.searchQuery);
+
     this.setState(prevState => {
-      const prevPokemon = prevState.pokemon.slice();
-      prevPokemon.push(newPokemon);
-      return {pokemon: prevPokemon};
+      const pokemon = prevState.pokemon.slice();
+      pokemon.unshift(newPokemon);
+      return {pokemon: pokemon};
     });
   }
 
